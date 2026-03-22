@@ -37,7 +37,7 @@ marcelomeireles-teste-tecnico-qa-performance-blazedemo/
 
 ## Pre-requisitos
 
-- **Java 8+** instalado
+- **Java 21+** instalado
 - **Apache JMeter 5.6.3** (ou superior)
   - Download: https://jmeter.apache.org/download_jmeter.cgi
 - Conexao com a internet para acessar https://www.blazedemo.com
@@ -54,26 +54,26 @@ Verifique se o Java esta instalado:
 java -version
 ~~~
 
-Se nao estiver, baixe em: https://www.java.com/pt-BR/download/
+Se nao estiver, baixe em: https://www.oracle.com/br/java/technologies/downloads/#jdk21-windows
 
 ### 2. Instalar o JMeter
 
 1. Acesse https://jmeter.apache.org/download_jmeter.cgi
-2. Baixe o arquivo `apache-jmeter-5.6.3.zip` (ou versao mais recente)
-3. Extraia em uma pasta de sua preferencia, por exemplo:
-   - Windows: `C:\jmeter\`
-   - Linux/macOS: `~/jmeter/`
+2. Baixe o arquivo `apache-jmeter-5.6.3.zip` em Binaries
+3. Extraia em uma pasta de sua preferencia, por exemplo `C:\jmeter\`
+4. Resultado esperado: `C:\jmeter\apache-jmeter-5.6.3\bin\jmeter.bat`
+
+> **Atencao (Windows):** Ao extrair o ZIP, verifique o caminho real do `jmeter.bat` com o comando:
+> ~~~
+> dir C:\jmeter\ -Recurse -Filter "jmeter.bat" | Select-Object FullName
+> ~~~
+> Use o caminho exato retornado nos comandos abaixo.
 
 ### 3. Clonar o Repositorio
 
 ~~~
 git clone https://github.com/Marcelo-Meireles/marcelomeireles-teste-tecnico-qa-performance-blazedemo.git
 cd marcelomeireles-teste-tecnico-qa-performance-blazedemo
-~~~
-
-### 4. Criar a pasta de reports
-
-~~~
 mkdir reports
 ~~~
 
@@ -84,29 +84,24 @@ mkdir reports
 ### Opcao 1: Interface Grafica do JMeter (recomendado para analise)
 
 1. Abra o JMeter:
-   - Windows: execute `apache-jmeter-5.6.3\bin\jmeter.bat`
+   - Windows: execute `C:\jmeter\apache-jmeter-5.6.3\apache-jmeter-5.6.3\bin\jmeter.bat`
    - Linux/macOS: execute `apache-jmeter-5.6.3/bin/jmeter.sh`
-
-2. No JMeter, va em **File > Open** e selecione o arquivo `.jmx` desejado:
-   - `jmeter/blazedemo-load-test.jmx` — para teste de carga
-   - `jmeter/blazedemo-spike-test.jmx` — para teste de pico
-
-3. Clique no botao **Play (verde)** para iniciar o teste
-
-4. Acompanhe os resultados em **Summary Report** e **Aggregate Report** no painel esquerdo
+2. Va em **File > Open** e selecione o arquivo `.jmx` desejado
+3. Clique no botao **Play (verde)** para iniciar
+4. Acompanhe em **Summary Report** e **Aggregate Report**
 
 ### Opcao 2: Linha de Comando (recomendado para CI/CD)
 
 **Teste de Carga:**
 
 ~~~
-apache-jmeter-5.6.3/bin/jmeter -n -t jmeter/blazedemo-load-test.jmx -l reports/load-test-results.csv -e -o reports/load-dashboard
+C:\jmeter\apache-jmeter-5.6.3\apache-jmeter-5.6.3\bin\jmeter.bat -n -t jmeter\blazedemo-load-test.jmx -l reports\load-test-results.csv -e -o reports\load-dashboard
 ~~~
 
 **Teste de Pico:**
 
 ~~~
-apache-jmeter-5.6.3/bin/jmeter -n -t jmeter/blazedemo-spike-test.jmx -l reports/spike-test-results.csv -e -o reports/spike-dashboard
+C:\jmeter\apache-jmeter-5.6.3\apache-jmeter-5.6.3\bin\jmeter.bat -n -t jmeter\blazedemo-spike-test.jmx -l reports\spike-test-results.csv -e -o reports\spike-dashboard
 ~~~
 
 **Parametros:**
@@ -116,7 +111,7 @@ apache-jmeter-5.6.3/bin/jmeter -n -t jmeter/blazedemo-spike-test.jmx -l reports/
 - `-e` — gera relatorio HTML
 - `-o` — pasta de saida do relatorio HTML
 
-Após a execucao, abra `reports/load-dashboard/index.html` no navegador para ver o relatorio completo.
+Apos a execucao, abra `reports/load-dashboard/index.html` no navegador para ver o relatorio completo.
 
 ---
 
@@ -124,37 +119,31 @@ Após a execucao, abra `reports/load-dashboard/index.html` no navegador para ver
 
 ### Teste de Carga (`blazedemo-load-test.jmx`)
 
-| Parametro          | Valor          |
-|--------------------|----------------|
-| Usuarios (threads) | 250            |
-| Ramp-up            | 60 segundos    |
+| Parametro          | Valor                |
+|--------------------|----------------------|
+| Usuarios (threads) | 250                  |
+| Ramp-up            | 60 segundos          |
 | Duracao            | 300 segundos (5 min) |
-| Tipo               | Carga sustentada |
-
-**Objetivo:** Simular 250 usuarios simultaneos durante 5 minutos com rampa gradual de 60 segundos, validando se o sistema suporta a carga esperada sem degradacao de performance.
+| Tipo               | Carga sustentada     |
 
 ### Teste de Pico (`blazedemo-spike-test.jmx`)
 
-| Parametro          | Valor          |
-|--------------------|----------------|
-| Usuarios (threads) | 300            |
-| Ramp-up            | 10 segundos    |
+| Parametro          | Valor                |
+|--------------------|----------------------|
+| Usuarios (threads) | 300                  |
+| Ramp-up            | 10 segundos          |
 | Duracao            | 120 segundos (2 min) |
-| Tipo               | Pico (Spike)   |
-
-**Objetivo:** Simular um pico repentino de 300 usuarios em apenas 10 segundos, avaliando a resiliencia do sistema sob carga inesperada e superior ao criterio de aceitacao.
+| Tipo               | Pico (Spike)         |
 
 ---
 
 ## Passos do Fluxo Testado
 
-Ambos os scripts executam o mesmo fluxo de negocio:
-
-| # | Passo                       | URL                              | Metodo | Assertion                              |
-|---|-----------------------------|----------------------------------|--------|----------------------------------------|
-| 1 | Home - Selecionar cidades   | `/`                              | POST   | Status 200                             |
-| 2 | Reserve - Selecionar voo    | `/reserve.php`                   | POST   | Status 200                             |
-| 3 | Purchase - Comprar passagem | `/purchase.php`                  | POST   | Status 200 + texto de confirmacao      |
+| # | Passo                       | URL              | Metodo | Assertion                         |
+|---|-----------------------------|------------------|--------|-----------------------------------|
+| 1 | Home - Selecionar cidades   | `/`              | POST   | Status 200                        |
+| 2 | Reserve - Selecionar voo    | `/reserve.php`   | POST   | Status 200                        |
+| 3 | Purchase - Comprar passagem | `/purchase.php`  | POST   | Status 200 + texto de confirmacao |
 
 A assertion do passo 3 valida que a resposta contem `Thank you for your purchase today!`
 
@@ -162,25 +151,33 @@ A assertion do passo 3 valida que a resposta contem `Thank you for your purchase
 
 ## Relatorio de Execucao
 
-> **Nota:** Os resultados abaixo sao baseados em execucao local. O site BlazeDemo e um ambiente de demo compartilhado sem SLA garantido, portanto os resultados podem variar dependendo da disponibilidade e infraestrutura do servidor no momento do teste.
+> **Nota:** Os testes foram executados em 21/03/2026 a partir de uma maquina local em Brasilia, Brasil. O BlazeDemo e um ambiente de demonstracao compartilhado e gratuito, sem SLA ou infraestrutura dedicada. Os resultados refletem o comportamento real do servidor naquele momento.
 
-### Teste de Carga - Resultados Simulados
+### Teste de Carga - Resultados Reais
 
-| Sampler                          | Amostras | Erro % | Throughput | P90 (ms) | P95 (ms) | Media (ms) |
-|----------------------------------|----------|--------|------------|----------|----------|------------|
-| 01 - Home (Selecionar Cidades)   | 15.000   | 0,2%   | 83/s       | 1.450    | 1.820    | 980        |
-| 02 - Reserve (Selecionar Voo)    | 15.000   | 0,3%   | 83/s       | 1.620    | 2.050    | 1.100      |
-| 03 - Purchase (Comprar Passagem) | 15.000   | 0,5%   | 83/s       | 1.890    | 2.300    | 1.250      |
-| **TOTAL**                        | **45.000** | **0,33%** | **250/s** | **1.890** | **2.300** | **1.110** |
+Execucao: `2026-03-21 21:56:35` | Duracao: `5m16s` | Usuarios: `250`
 
-### Teste de Pico - Resultados Simulados
+| Metrica              | Resultado   |
+|----------------------|-------------|
+| Total de amostras    | 82.134      |
+| Throughput           | 259,7 req/s |
+| Tempo medio          | 825 ms      |
+| Tempo minimo         | 0 ms        |
+| Tempo maximo         | 21.631 ms   |
+| Taxa de erro         | 67,33%      |
 
-| Sampler                          | Amostras | Erro % | Throughput | P90 (ms) | P95 (ms) | Media (ms) |
-|----------------------------------|----------|--------|------------|----------|----------|------------|
-| 01 - Home (Selecionar Cidades)   | 3.600    | 1,8%   | 90/s       | 2.100    | 3.200    | 1.400      |
-| 02 - Reserve (Selecionar Voo)    | 3.600    | 2,1%   | 90/s       | 2.350    | 3.800    | 1.600      |
-| 03 - Purchase (Comprar Passagem) | 3.600    | 3,2%   | 90/s       | 2.950    | 4.100    | 2.100      |
-| **TOTAL**                        | **10.800** | **2,37%** | **270/s** | **2.950** | **4.100** | **1.700** |
+### Teste de Pico - Resultados Reais
+
+Execucao: `2026-03-21 22:06:45` | Duracao: `2m10s` | Usuarios: `300`
+
+| Metrica              | Resultado   |
+|----------------------|-------------|
+| Total de amostras    | 13.753      |
+| Throughput           | 105,4 req/s |
+| Tempo medio          | 2.589 ms    |
+| Tempo minimo         | 164 ms      |
+| Tempo maximo         | 11.070 ms   |
+| Taxa de erro         | 70,14%      |
 
 ---
 
@@ -192,61 +189,57 @@ A assertion do passo 3 valida que a resposta contem `Thank you for your purchase
 
 ### Teste de Carga
 
-**Resultado: CRITERIO PARCIALMENTE ATENDIDO**
+**Resultado: CRITERIO NAO ATENDIDO**
 
-| Metrica          | Criterio   | Resultado      | Status  |
-|------------------|------------|----------------|---------|
-| Vazao            | 250 req/s  | ~250 req/s     | PASSOU  |
-| P90              | < 2000ms   | ~1890ms        | PASSOU  |
-| Taxa de erro     | < 1%       | 0,33%          | PASSOU  |
+| Metrica      | Criterio  | Resultado   | Status     |
+|--------------|-----------|-------------|------------|
+| Throughput   | 250 req/s | 259,7 req/s | PASSOU     |
+| Taxa de erro | < 1%      | 67,33%      | NAO PASSOU |
 
-O teste de carga demonstrou que o sistema BlazeDemo consegue atender ao criterio de aceitacao sob carga controlada de 250 usuarios com rampa gradual de 60 segundos. O P90 ficou dentro do limite (<2s) e o throughput atingiu a meta de 250 req/s.
+O throughput de **259,7 req/s superou o criterio de vazao de 250 req/s**, porem a **taxa de erro de 67,33% invalida o resultado**. O servidor BlazeDemo rejeitou a grande maioria das requisicoes durante a carga sustentada de 250 usuarios simultaneos.
 
 ### Teste de Pico
 
 **Resultado: CRITERIO NAO ATENDIDO**
 
-| Metrica          | Criterio   | Resultado      | Status      |
-|------------------|------------|----------------|-------------|
-| Vazao            | 250 req/s  | ~270 req/s     | PASSOU      |
-| P90              | < 2000ms   | ~2950ms        | NAO PASSOU  |
-| Taxa de erro     | < 1%       | 2,37%          | NAO PASSOU  |
+| Metrica      | Criterio  | Resultado   | Status     |
+|--------------|-----------|-------------|------------|
+| Throughput   | 250 req/s | 105,4 req/s | NAO PASSOU |
+| Tempo medio  | P90 < 2s  | 2.589 ms    | NAO PASSOU |
+| Taxa de erro | < 1%      | 70,14%      | NAO PASSOU |
 
-No teste de pico, com rampa de apenas 10 segundos para 300 usuarios, o P90 ultrapassou o limite de 2 segundos (chegando a ~2.950ms) e a taxa de erro subiu para 2,37%. Isso indica que o sistema BlazeDemo nao suporta picos abruptos de carga sem degradacao.
+No teste de pico, com 300 usuarios e ramp-up de apenas 10 segundos, o servidor entrou em colapso imediato: o throughput caiu para 105 req/s e o tempo medio de resposta subiu para 2.589ms, com 70% de erros.
 
 ### Conclusao
 
-**O criterio de aceitacao e atendido apenas em condicoes de carga gradual e controlada (teste de carga), mas nao em cenarios de pico repentino.**
+**O criterio de aceitacao NAO foi atendido em nenhum dos dois cenarios.**
 
-Motivos para o nao atendimento no teste de pico:
+Motivos identificados:
 
-1. **Infraestrutura do BlazeDemo:** O site e uma aplicacao de demonstracao sem infraestrutura dedicada para alta disponibilidade.
-2. **Sem auto-scaling:** A aplicacao nao possui escalabilidade automatica para absorver picos de carga.
-3. **Rampa muito agressiva:** 300 usuarios em 10 segundos gera uma sobrecarga imediata nos servidores.
-4. **Ambiente compartilhado:** O BlazeDemo e usado por multiplos usuarios simultaneamente ao redor do mundo.
+1. **Infraestrutura do BlazeDemo:** O site e uma aplicacao de demonstracao publica sem infraestrutura dedicada para alta carga.
+2. **Servidor compartilhado:** O BlazeDemo e utilizado simultaneamente por usuarios ao redor do mundo para fins de treinamento e testes, o que compromete os resultados.
+3. **Ausencia de session management:** O fluxo de 3 passos (home > reserve > purchase) depende de estado de sessao. Sob alta carga, o servidor nao consegue manter as sessoes, resultando em falhas no passo `/purchase.php`.
+4. **Sem auto-scaling ou cache:** A aplicacao nao possui mecanismos para absorver picos de demanda.
 
-**Recomendacoes:**
-- Para um sistema de producao real, seria necessario implementar cache, load balancer e auto-scaling.
-- O criterio de 250 req/s com P90 < 2s e tecnicamente alcancavel com arquitetura adequada.
-- Recomenda-se executar os testes em horarios de baixa demanda para minimizar interferencias externas.
+**Em um sistema de producao real** com arquitetura adequada (load balancer, cache, auto-scaling e banco de dados otimizado), o criterio de 250 req/s com P90 < 2s seria tecnicamente alcancavel. Os scripts JMeter desenvolvidos estao corretos e prontos para serem reutilizados em qualquer ambiente com maior capacidade.
 
 ---
 
 ## Boas Praticas Aplicadas
 
-- Cookie Manager configurado com `clearEachIteration=true` para simular sessoes independentes
+- Cookie Manager com `clearEachIteration=true` para simular sessoes independentes
 - HTTP Request Defaults centralizado para facilitar manutencao da URL base
-- Assertions em todos os passos do fluxo (status HTTP + texto de confirmacao)
+- Assertions em todos os passos (status HTTP + texto de confirmacao)
 - Result Collector configurado para salvar CSV com dados completos
-- Ramp-up gradual no teste de carga para evitar pico artificial
-- Ramp-up agressivo no teste de pico para simular cenario real de sobrecarga
+- Ramp-up gradual no teste de carga (60s) para evitar pico artificial
+- Ramp-up agressivo no teste de pico (10s) para simular sobrecarga real
 
 ---
 
 ## Tecnologias Utilizadas
 
 - Apache JMeter 5.6.3
-- Java 8+
+- Java 21 LTS
 - Protocolo HTTPS
 - Site de demo: https://www.blazedemo.com
 
