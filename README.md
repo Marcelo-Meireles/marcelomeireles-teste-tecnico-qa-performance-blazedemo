@@ -243,10 +243,3 @@ Motivos identificados:
 - Protocolo HTTPS
 - Site de demo: https://www.blazedemo.com
 
----
-
-## Autor
-
-**Marcelo Meireles**
-QA Engineer
-GitHub: https://github.com/Marcelo-Meireles
