@@ -29,7 +29,10 @@ marcelomeireles-teste-tecnico-qa-performance-blazedemo/
 │   ├── blazedemo-load-test.jmx    # Teste de Carga (250 usuarios, 5 minutos)
 │   └── blazedemo-spike-test.jmx   # Teste de Pico (300 usuarios, rampa 10s)
 ├── reports/
-│   └── (gerado apos execucao)
+│   ├── load-dashboard/            # Relatorio HTML do teste de carga
+│   ├── spike-dashboard/           # Relatorio HTML do teste de pico
+│   ├── load-test-results.csv      # CSV com dados brutos do teste de carga
+│   └── spike-test-results.csv     # CSV com dados brutos do teste de pico
 └── README.md
 ~~~
 
@@ -111,7 +114,17 @@ C:\jmeter\apache-jmeter-5.6.3\apache-jmeter-5.6.3\bin\jmeter.bat -n -t jmeter\bl
 - `-e` — gera relatorio HTML
 - `-o` — pasta de saida do relatorio HTML
 
-Apos a execucao, abra `reports/load-dashboard/index.html` no navegador para ver o relatorio completo.
+### Como visualizar o relatorio HTML
+
+Apos a execucao, abra no navegador o arquivo gerado:
+
+~~~
+reports\load-dashboard\index.html
+~~~
+
+O relatorio HTML contem graficos interativos com throughput, tempo de resposta por percentil, taxa de erro e estatisticas completas por sampler.
+
+> **Os relatorios da execucao realizada em 21/03/2026 estao disponiveis na pasta `reports/` deste repositorio.**
 
 ---
 
@@ -157,33 +170,31 @@ A assertion do passo 3 valida que a resposta contem `Thank you for your purchase
 
 Execucao: `2026-03-21 21:56:35` | Duracao: `5m16s` | Usuarios: `250`
 
-| Metrica              | Resultado   |
-|----------------------|-------------|
-| Total de amostras    | 82.134      |
-| Throughput           | 259,7 req/s |
-| Tempo medio          | 825 ms      |
-| Tempo minimo         | 0 ms        |
-| Tempo maximo         | 21.631 ms   |
-| Taxa de erro         | 67,33%      |
+| Metrica           | Resultado   |
+|-------------------|-------------|
+| Total de amostras | 82.134      |
+| Throughput        | 259,7 req/s |
+| Tempo medio       | 825 ms      |
+| Tempo minimo      | 0 ms        |
+| Tempo maximo      | 21.631 ms   |
+| Taxa de erro      | 67,33%      |
 
 ### Teste de Pico - Resultados Reais
 
 Execucao: `2026-03-21 22:06:45` | Duracao: `2m10s` | Usuarios: `300`
 
-| Metrica              | Resultado   |
-|----------------------|-------------|
-| Total de amostras    | 13.753      |
-| Throughput           | 105,4 req/s |
-| Tempo medio          | 2.589 ms    |
-| Tempo minimo         | 164 ms      |
-| Tempo maximo         | 11.070 ms   |
-| Taxa de erro         | 70,14%      |
+| Metrica           | Resultado   |
+|-------------------|-------------|
+| Total de amostras | 13.753      |
+| Throughput        | 105,4 req/s |
+| Tempo medio       | 2.589 ms    |
+| Tempo minimo      | 164 ms      |
+| Tempo maximo      | 11.070 ms   |
+| Taxa de erro      | 70,14%      |
 
 ---
 
 ## Analise dos Resultados
-
-### Criterio de Aceitacao
 
 **Criterio:** 250 requisicoes por segundo com P90 < 2 segundos
 
@@ -196,7 +207,7 @@ Execucao: `2026-03-21 22:06:45` | Duracao: `2m10s` | Usuarios: `300`
 | Throughput   | 250 req/s | 259,7 req/s | PASSOU     |
 | Taxa de erro | < 1%      | 67,33%      | NAO PASSOU |
 
-O throughput de **259,7 req/s superou o criterio de vazao de 250 req/s**, porem a **taxa de erro de 67,33% invalida o resultado**. O servidor BlazeDemo rejeitou a grande maioria das requisicoes durante a carga sustentada de 250 usuarios simultaneos.
+O throughput de **259,7 req/s superou o criterio de vazao**, porem a **taxa de erro de 67,33% invalida o resultado**. O servidor BlazeDemo rejeitou a grande maioria das requisicoes durante a carga sustentada de 250 usuarios simultaneos.
 
 ### Teste de Pico
 
@@ -208,7 +219,7 @@ O throughput de **259,7 req/s superou o criterio de vazao de 250 req/s**, porem 
 | Tempo medio  | P90 < 2s  | 2.589 ms    | NAO PASSOU |
 | Taxa de erro | < 1%      | 70,14%      | NAO PASSOU |
 
-No teste de pico, com 300 usuarios e ramp-up de apenas 10 segundos, o servidor entrou em colapso imediato: o throughput caiu para 105 req/s e o tempo medio de resposta subiu para 2.589ms, com 70% de erros.
+No teste de pico, com 300 usuarios e ramp-up de 10 segundos, o servidor entrou em colapso: o throughput caiu para 105 req/s e o tempo medio subiu para 2.589ms, com 70% de erros.
 
 ### Conclusao
 
@@ -216,12 +227,12 @@ No teste de pico, com 300 usuarios e ramp-up de apenas 10 segundos, o servidor e
 
 Motivos identificados:
 
-1. **Infraestrutura do BlazeDemo:** O site e uma aplicacao de demonstracao publica sem infraestrutura dedicada para alta carga.
-2. **Servidor compartilhado:** O BlazeDemo e utilizado simultaneamente por usuarios ao redor do mundo para fins de treinamento e testes, o que compromete os resultados.
-3. **Ausencia de session management:** O fluxo de 3 passos (home > reserve > purchase) depende de estado de sessao. Sob alta carga, o servidor nao consegue manter as sessoes, resultando em falhas no passo `/purchase.php`.
+1. **Infraestrutura do BlazeDemo:** Aplicacao de demonstracao publica sem infraestrutura dedicada para alta carga.
+2. **Servidor compartilhado:** Utilizado simultaneamente por usuarios ao redor do mundo para treinamento e testes.
+3. **Ausencia de session management:** O fluxo de 3 passos depende de estado de sessao. Sob alta carga, o servidor nao consegue manter as sessoes, resultando em falhas no passo `/purchase.php`.
 4. **Sem auto-scaling ou cache:** A aplicacao nao possui mecanismos para absorver picos de demanda.
 
-**Em um sistema de producao real** com arquitetura adequada (load balancer, cache, auto-scaling e banco de dados otimizado), o criterio de 250 req/s com P90 < 2s seria tecnicamente alcancavel. Os scripts JMeter desenvolvidos estao corretos e prontos para serem reutilizados em qualquer ambiente com maior capacidade.
+**Em um sistema de producao real** com arquitetura adequada (load balancer, cache, auto-scaling e banco de dados otimizado), o criterio de 250 req/s com P90 < 2s seria tecnicamente alcancavel. Os scripts JMeter desenvolvidos estao corretos e prontos para reutilizacao em qualquer ambiente com maior capacidade.
 
 ---
 
@@ -243,3 +254,22 @@ Motivos identificados:
 - Protocolo HTTPS
 - Site de demo: https://www.blazedemo.com
 
+---
+
+## English Summary
+
+This repository contains **JMeter performance test scripts** for the [BlazeDemo](https://www.blazedemo.com) flight booking system.
+
+**Tested scenario:** Full flight purchase flow (city selection > flight selection > payment > confirmation).
+
+**Acceptance criteria:** 250 requests/second with 90th percentile response time below 2 seconds.
+
+**Test types:**
+- **Load Test:** 250 threads, 60s ramp-up, 5-minute duration
+- **Spike Test:** 300 threads, 10s ramp-up, 2-minute duration
+
+**Results (executed on March 21, 2026):**
+- Load test achieved **259.7 req/s throughput** but presented a **67.33% error rate**
+- Spike test reached only **105.4 req/s** with a **70.14% error rate**
+
+**Conclusion:** The acceptance criteria was **not met** in either scenario. BlazeDemo is a shared demo environment without dedicated infrastructure or session management for high-load scenarios. The scripts are production-ready and can be reused in environments with proper infrastructure.
